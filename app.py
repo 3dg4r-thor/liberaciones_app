@@ -1,6 +1,10 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, send_file
 import sqlite3
 from datetime import datetime
+from io import BytesIO
+from xhtml2pdf import pisa
+import pandas as pd
+import io
 
 app = Flask(__name__)  
 
@@ -126,9 +130,7 @@ def exportar_pdf():
 
     result.seek(0)
     return send_file(result, download_name="historial.pdf", as_attachment=True)
-import pandas as pd
-from flask import send_file
-import io
+
 
 @app.route('/exportar_excel')
 def exportar_excel():
