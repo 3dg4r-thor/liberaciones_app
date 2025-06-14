@@ -12,7 +12,8 @@
             <th>Estado / Status</th>
             <th>Responsable / By</th>
             <th>Observaciones / Notes</th>
-        </tr>
+        </tr>            <td>{{ row[4] }}</td>
+
     </thead>
     <tbody>
         {% for row in datos %}
@@ -20,7 +21,6 @@
             <td>{{ row[1] }}</td>
             <td>{{ row[2] }}</td>
             <td>{{ row[3] }}</td>
-            <td>{{ row[4] }}</td>
             <td>{{ row[5] }}</td>
             <td>{{ row[6] }}</td>
             <td>{{ row[7] }}</td>
