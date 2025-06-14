@@ -17,10 +17,17 @@
         </div>
         <div class="col-md-3">
             <button type="submit" class="btn btn-primary w-100">Filtrar</button>
-        </div>
+	</div>
     </div>
 </form>
-
+<div class="row mb-4">
+	<div class="col-md-3">
+    		<a href="{{ url_for('exportar_excel', **request.args) }}" class="btn btn-success w-100">Exportar a excel</a>
+	</div>
+	<div class="col-md-3">
+    		<a href="{{ url_for('exportar_pdf', **request.args) }}" class="btn btn-danger w-100">Exportar a PDF</a>
+	</div>
+</div>
 <!-- TABLA DE RESULTADOS -->
 <table class="table table-striped">
     <thead>
