@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Fecha / Date</th>
+            <th>Área / Area</th>
+            <th>Tipo / Type</th>
+            <th>Código / Code</th>
+            <th>Orden / Order</th>
+            <th>Cantidad / Qty</th>
+            <th>Estado / Status</th>
+            <th>Responsable / By</th>
+            <th>Observaciones / Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in datos %}
+        <tr>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+            <td>{{ row[4] }}</td>
+            <td>{{ row[5] }}</td>
+            <td>{{ row[6] }}</td>
+            <td>{{ row[7] }}</td>
+            <td>{{ row[8] }}</td>
+            <td>{{ row[9] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
