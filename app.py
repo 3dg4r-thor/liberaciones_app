@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, send_file
 import sqlite3
 from datetime import datetime
+import pytz
 from io import BytesIO
 from xhtml2pdf import pisa
 import pandas as pd
@@ -38,7 +39,8 @@ def index():
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        timezone = pytz.timezone('America/Mexico_City')
+        fecha = datetime.now(zona_horaria).strftime("%Y-%m-%d %H:%M:%S")
         area = request.form['area']
         tipo_producto = request.form['tipo_producto']
         codigo_producto = request.form['codigo_producto']
