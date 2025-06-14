@@ -59,13 +59,33 @@ def registro():
 
     return render_template('registro.html')
 
-@app.route('/historial')
+@app.route('/historial', methods=['GET'])
 def historial():
     conn = sqlite3.connect('liberaciones.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM liberaciones ORDER BY fecha DESC')
+
+    # Obtener los filtros del formulario
+    fecha = request.args.get('fecha')
+    tipo = request.args.get('tipo')
+    area = request.args.get('area')
+
+    query = "SELECT * FROM liberaciones WHERE 1=1"
+    params = []
+
+    if fecha:
+        query += " AND date(fecha) = ?"
+        params.append(fecha)
+    if tipo:
+        query += " AND tipo = ?"
+        params.append(tipo)
+    if area:
+        query += " AND area = ?"
+        params.append(area)
+
+    cursor.execute(query, params)
     datos = cursor.fetchall()
     conn.close()
+
     return render_template('historial.html', datos=datos)
 
 if __name__ == '__main__':

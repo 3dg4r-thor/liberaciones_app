@@ -1,17 +1,39 @@
 {% extends 'base.html' %}
 {% block content %}
+
+<h2 class="mb-4">Historial de Liberaciones</h2>
+
+<!-- FORMULARIO DE FILTROS -->
+<form method="GET" class="mb-4">
+    <div class="row g-2">
+        <div class="col-md-3">
+            <input type="date" name="fecha" class="form-control" placeholder="Fecha" value="{{ request.args.get('fecha', '') }}">
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="tipo" class="form-control" placeholder="Tipo de producto" value="{{ request.args.get('tipo', '') }}">
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="area" class="form-control" placeholder="Área" value="{{ request.args.get('area', '') }}">
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </div>
+    </div>
+</form>
+
+<!-- TABLA DE RESULTADOS -->
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Fecha / Date</th>
-            <th>Área / Area</th>
-            <th>Tipo / Type</th>
-            <th>Código / Code</th>
-            <th>Orden / Order</th>
-            <th>Cantidad / Qty</th>
-            <th>Estado / Status</th>
-            <th>Responsable / By</th>
-            <th>Observaciones / Notes</th>
+            <th>Fecha</th>
+            <th>Área</th>
+            <th>Tipo</th>
+            <th>Código</th>
+            <th>Orden</th>
+            <th>Cantidad</th>
+            <th>Estado</th>
+            <th>Responsable</th>
+            <th>Observaciones</th>
         </tr>
     </thead>
     <tbody>
@@ -20,14 +42,15 @@
             <td>{{ row[1] }}</td>
             <td>{{ row[2] }}</td>
             <td>{{ row[3] }}</td>
-            <td>{{ row[4] }}</td>
             <td>{{ row[5] }}</td>
             <td>{{ row[6] }}</td>
             <td>{{ row[7] }}</td>
             <td>{{ row[8] }}</td>
             <td>{{ row[9] }}</td>
+            <td>{{ row[10] }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
 {% endblock %}
