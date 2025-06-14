@@ -39,7 +39,7 @@ def index():
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        timezone = pytz.timezone('America/Mexico_City')
+        zona_horaria = pytz.timezone('America/Mexico_City')
         fecha = datetime.now(zona_horaria).strftime("%Y-%m-%d %H:%M:%S")
         area = request.form['area']
         tipo_producto = request.form['tipo_producto']
