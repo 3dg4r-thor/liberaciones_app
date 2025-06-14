@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect
 import sqlite3
 from datetime import datetime
 
-app = Flask(_name)  # Nota: __name, no _name
+app = Flask(__name__)  # Nota: __name, no _name
 
 # Crear la base de datos si no existe
 def init_db():
