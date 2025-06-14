@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect
 import sqlite3
 from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(_name)  # Nota: __name, no _name
 
 # Crear la base de datos si no existe
 def init_db():
@@ -66,7 +66,7 @@ def historial():
 
     # Obtener los filtros del formulario
     fecha = request.args.get('fecha')
-    tipo = request.args.get('tipo')
+    tipo_producto = request.args.get('tipo_producto')
     area = request.args.get('area')
 
     query = "SELECT * FROM liberaciones WHERE 1=1"
@@ -75,9 +75,9 @@ def historial():
     if fecha:
         query += " AND date(fecha) = ?"
         params.append(fecha)
-    if tipo:
-        query += " AND tipo = ?"
-        params.append(tipo)
+    if tipo_producto:
+        query += " AND tipo_producto = ?"
+        params.append(tipo_producto)
     if area:
         query += " AND area = ?"
         params.append(area)
@@ -88,5 +88,5 @@ def historial():
 
     return render_template('historial.html', datos=datos)
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     app.run(host='0.0.0.0', port=5000, debug=True)
