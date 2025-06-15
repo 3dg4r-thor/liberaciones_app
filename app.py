@@ -7,7 +7,7 @@ from xhtml2pdf import pisa
 import pandas as pd
 import io
 
-app = Flask(_name_)
+app = Flask(__name__)
 app.secret_key = 'Torresrod_9413'
 
 # Crear tablas si no existen
@@ -236,5 +236,5 @@ def exportar_excel():
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
