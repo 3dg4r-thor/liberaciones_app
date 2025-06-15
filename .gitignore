@@ -1,0 +1,14 @@
+# Archivos de Python compilados
+_pycache_/
+*.pyc
+
+# Base de datos local
+liberaciones.db
+
+# Entornos virtuales
+venv/
+.env
+
+# Archivos temporales
+*.log
+*.tmp
