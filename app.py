@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, send_file
+from flask import Flask, render_template, request, redirect, send_file, session, url_for
 import sqlite3
 from datetime import datetime
 import pytz
@@ -7,9 +7,10 @@ from xhtml2pdf import pisa
 import pandas as pd
 import io
 
-app = Flask(__name__)  
+app = Flask(_name_)
+app.secret_key = 'Torresrod_9413'
 
-# Crear la base de datos si no existe
+# Crear tablas si no existen
 def init_db():
     conn = sqlite3.connect('liberaciones.db')
     cursor = conn.cursor()
@@ -27,13 +28,6 @@ def init_db():
             observaciones TEXT
         )
     ''')
-    conn.commit()
-    conn.close()
-
-init_db()
-def init_user_table():
-    conn = sqlite3.connect('liberaciones.db')
-    cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,13 +38,61 @@ def init_user_table():
     conn.commit()
     conn.close()
 
-init_user_table()
+init_db()
+
 @app.route('/')
 def index():
     return redirect('/login')
 
+@app.route('/registrar_usuario', methods=['GET', 'POST'])
+def registrar_usuario():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        conn = sqlite3.connect('liberaciones.db')
+        cursor = conn.cursor()
+        try:
+            cursor.execute('INSERT INTO usuarios (username, password) VALUES (?, ?)', (username, password))
+            conn.commit()
+            return redirect('/login')
+        except sqlite3.IntegrityError:
+            return render_template('registrar_usuario.html', error="Nombre de usuario ya existe")
+        finally:
+            conn.close()
+
+    return render_template('registrar_usuario.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        conn = sqlite3.connect('liberaciones.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM usuarios WHERE username = ? AND password = ?', (username, password))
+        user = cursor.fetchone()
+        conn.close()
+
+        if user:
+            session['usuario'] = username
+            return redirect('/registro')
+        else:
+            return render_template('login.html', error="Usuario o contraseña incorrectos")
+
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('usuario', None)
+    return redirect('/login')
+
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
+    if 'usuario' not in session:
+        return redirect('/login')
+
     if request.method == 'POST':
         zona_horaria = pytz.timezone('America/Mexico_City')
         fecha = datetime.now(zona_horaria).strftime("%Y-%m-%d %H:%M:%S")
@@ -80,10 +122,12 @@ def registro():
 
 @app.route('/historial', methods=['GET'])
 def historial():
+    if 'usuario' not in session:
+        return redirect('/login')
+
     conn = sqlite3.connect('liberaciones.db')
     cursor = conn.cursor()
 
-    # Obtener los filtros del formulario
     fecha = request.args.get('fecha')
     tipo_producto = request.args.get('tipo_producto')
     area = request.args.get('area')
@@ -106,12 +150,15 @@ def historial():
     conn.close()
 
     return render_template('historial.html', datos=datos)
+
 @app.route('/exportar_pdf')
 def exportar_pdf():
+    if 'usuario' not in session:
+        return redirect('/login')
+
     conn = sqlite3.connect('liberaciones.db')
     cursor = conn.cursor()
 
-    # Filtros
     fecha = request.args.get('fecha')
     tipo_producto = request.args.get('tipo_producto')
     area = request.args.get('area')
@@ -133,10 +180,7 @@ def exportar_pdf():
     datos = cursor.fetchall()
     conn.close()
 
-    # Renderizar plantilla HTML
     rendered_html = render_template('historial_pdf.html', datos=datos)
-
-    # Convertir HTML a PDF
     result = BytesIO()
     pisa_status = pisa.CreatePDF(rendered_html, dest=result)
 
@@ -146,9 +190,11 @@ def exportar_pdf():
     result.seek(0)
     return send_file(result, download_name="historial.pdf", as_attachment=True)
 
-
 @app.route('/exportar_excel')
 def exportar_excel():
+    if 'usuario' not in session:
+        return redirect('/login')
+
     fecha = request.args.get('fecha')
     tipo_producto = request.args.get('tipo_producto')
     area = request.args.get('area')
@@ -173,13 +219,11 @@ def exportar_excel():
     rows = cursor.fetchall()
     conn.close()
 
-    # Crear DataFrame
     df = pd.DataFrame(rows, columns=[
         'ID', 'Fecha', 'Área', 'Tipo de Producto', 'Código', 'Orden', 'Cantidad',
         'Estado', 'Responsable', 'Observaciones'
     ])
 
-    # Convertir a Excel
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         df.to_excel(writer, index=False, sheet_name='Liberaciones')
@@ -191,23 +235,6 @@ def exportar_excel():
         as_attachment=True,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
 
-        conn = sqlite3.connect('liberaciones.db')
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM usuarios WHERE username = ? AND password = ?', (username, password))
-        user = cursor.fetchone()
-        conn.close()
-
-        if user:
-            return redirect('/registro')
-        else:
-            return render_template('login.html', error="Usuario o contraseña incorrectos")
-
-    return render_template('login.html')
-if __name__ == '__main__':
+if _name_ == '_main_':
     app.run(host='0.0.0.0', port=5000, debug=True)
