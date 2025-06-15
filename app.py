@@ -31,10 +31,23 @@ def init_db():
     conn.close()
 
 init_db()
+def init_user_table():
+    conn = sqlite3.connect('liberaciones.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
+init_user_table()
 @app.route('/')
 def index():
-    return redirect('/registro')
+    return redirect('/login')
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
@@ -178,5 +191,23 @@ def exportar_excel():
         as_attachment=True,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        conn = sqlite3.connect('liberaciones.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM usuarios WHERE username = ? AND password = ?', (username, password))
+        user = cursor.fetchone()
+        conn.close()
+
+        if user:
+            return redirect('/registro')
+        else:
+            return render_template('login.html', error="Usuario o contraseña incorrectos")
+
+    return render_template('login.html')
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
