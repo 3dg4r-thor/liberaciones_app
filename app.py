@@ -6,7 +6,16 @@ from io import BytesIO
 from xhtml2pdf import pisa
 import pandas as pd
 import io
+from functools import wraps
+from flask import session, redirect, url_for
 
+def login_requerido(f):
+    @wraps(f)
+    def decorada(*args, **kwargs):
+        if 'usuario' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorada
 app = Flask(__name__)
 app.secret_key = 'Torresrod_9413'
 
@@ -89,6 +98,7 @@ def logout():
     return redirect('/login')
 
 @app.route('/registro', methods=['GET', 'POST'])
+@login_requerido
 def registro():
     if 'usuario' not in session:
         return redirect('/login')
@@ -121,6 +131,7 @@ def registro():
     return render_template('registro.html')
 
 @app.route('/historial', methods=['GET'])
+@login_requerido
 def historial():
     if 'usuario' not in session:
         return redirect('/login')
@@ -152,6 +163,7 @@ def historial():
     return render_template('historial.html', datos=datos)
 
 @app.route('/exportar_pdf')
+@login_requerido
 def exportar_pdf():
     if 'usuario' not in session:
         return redirect('/login')
@@ -191,6 +203,7 @@ def exportar_pdf():
     return send_file(result, download_name="historial.pdf", as_attachment=True)
 
 @app.route('/exportar_excel')
+@login_requerido
 def exportar_excel():
     if 'usuario' not in session:
         return redirect('/login')
